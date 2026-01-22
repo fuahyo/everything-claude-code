@@ -529,4 +529,104 @@ After build error resolution:
 
 ---
 
+## Example Usage
+
+```
+User: /build-fix
+
+Agent (build-error-resolver):
+# Build Error Resolution Report
+
+**Date:** 2026-01-20
+**Build Target:** Next.js Production
+**Initial Errors:** 5
+**Errors Fixed:** 5
+**Build Status:** ✅ PASSING
+
+## Errors Fixed
+
+### 1. Type Inference Failure
+**Location:** `src/components/MarketCard.tsx:45`
+**Error Message:**
+```
+Parameter 'market' implicitly has an 'any' type.
+```
+
+**Root Cause:** Missing type annotation for function parameter
+
+**Fix Applied:**
+```diff
+- function formatMarket(market) {
++ function formatMarket(market: Market) {
+    return market.name
+  }
+```
+
+**Lines Changed:** 1
+**Impact:** NONE - Type safety improvement only
+
+### 2. Missing Import
+**Location:** `src/lib/utils.ts:12`
+**Error Message:**
+```
+Cannot find module '@/types'
+```
+
+**Root Cause:** Incorrect import path
+
+**Fix Applied:**
+```diff
+- import { Market } from '@/types'
++ import { Market } from '@/types/market'
+```
+
+**Lines Changed:** 1
+
+## Verification Steps
+1. ✅ TypeScript check passes: `npx tsc --noEmit`
+2. ✅ Next.js build succeeds: `npm run build`
+3. ✅ No new errors introduced
+4. ✅ Development server runs: `npm run dev`
+
+## Summary
+- Total errors resolved: 5
+- Total lines changed: 5
+- Build status: ✅ PASSING
+- Time to fix: 3 minutes
+```
+
+## Integration
+
+This agent is invoked by:
+- `/build-fix` command - Manual invocation
+- Rules - Automatic detection when build fails
+- Other agents - When they encounter build errors
+
+Related agents:
+- `code-reviewer` - Review code after build passes
+- `tdd-guide` - Write tests (may reveal type issues)
+- `planner` - Plan changes if errors indicate architectural issues
+
+Related commands:
+- `/build-fix` - Invokes this agent
+- `/code-review` - Review code after build passes
+- `/tdd` - Write tests with proper types
+
+## Related Files
+
+- `commands/build-fix.md` - Command that invokes this agent
+- `rules/agents.md` - Rules for agent delegation
+- `README.md` - Overview of agents directory
+
+## Troubleshooting
+
+**Issue**: Build errors persist after multiple fix attempts
+- **Solution**: Stop and investigate root cause, may need architectural change
+
+**Issue**: Fix introduces new errors
+- **Solution**: Revert fix, try alternative approach, may need to understand dependencies better
+
+**Issue**: Type errors seem incorrect
+- **Solution**: Verify TypeScript version, check tsconfig.json settings, may be configuration issue
+
 **Remember**: The goal is to fix errors quickly with minimal changes. Don't refactor, don't optimize, don't redesign. Fix the error, verify the build passes, move on. Speed and precision over perfection.

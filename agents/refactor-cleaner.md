@@ -283,13 +283,24 @@ If something breaks after removal:
 7. **Peer Review** - Have deletions reviewed before merging
 8. **Monitor Production** - Watch for errors after deployment
 
-## When NOT to Use This Agent
+## When to Use
+
+Use this agent when:
+- Codebase has accumulated dead code
+- Unused dependencies are bloating the project
+- Duplicate code needs consolidation
+- Codebase maintenance is needed
+- Bundle size needs reduction
+- After major refactoring (clean up leftovers)
+
+## When NOT to Use
 
 - During active feature development
 - Right before a production deployment
 - When codebase is unstable
 - Without proper test coverage
 - On code you don't understand
+- When tests are failing
 
 ## Success Metrics
 
@@ -302,5 +313,83 @@ After cleanup session:
 - ✅ No regressions in production
 
 ---
+
+## Example Usage
+
+```
+User: /refactor-clean
+
+Agent (refactor-cleaner):
+# Dead Code Cleanup Report
+
+**Date:** 2026-01-20
+**Analysis Tools:** knip, depcheck, ts-prune
+
+## Findings
+
+### Unused Dependencies (SAFE to remove)
+- `lodash@4.17.21` - Not imported anywhere (Size: 72 KB)
+- `moment@2.29.4` - Replaced by date-fns (Size: 289 KB)
+
+### Unused Files (SAFE to remove)
+- `src/components/OldButton.tsx` - Replaced by Button.tsx
+- `src/lib/deprecated-utils.ts` - Functionality moved to utils.ts
+
+### Unused Exports (CAUTION)
+- `src/utils/helpers.ts` - Functions: `formatOld()`, `legacyHelper()`
+- No references found, but verify no dynamic imports
+
+## Proposed Deletions
+
+### Phase 1: Unused Dependencies
+1. Remove `lodash` from package.json
+2. Remove `moment` from package.json
+3. Run `npm install`
+4. Run tests: ✅ All passing
+
+### Phase 2: Unused Files
+1. Delete `src/components/OldButton.tsx`
+2. Delete `src/lib/deprecated-utils.ts`
+3. Run tests: ✅ All passing
+
+## Impact Summary
+- Files deleted: 2
+- Dependencies removed: 2
+- Lines of code removed: 450
+- Bundle size reduction: ~361 KB
+```
+
+## Integration
+
+This agent is invoked by:
+- `/refactor-clean` command - Manual invocation
+- Rules - Periodic maintenance tasks
+- After major refactoring - Clean up leftovers
+
+Related agents:
+- `code-reviewer` - Review deletions before committing
+- `build-error-resolver` - Fix any build errors from deletions
+
+Related commands:
+- `/refactor-clean` - Invokes this agent
+- `/code-review` - Review deletions
+- `/build-fix` - Fix any build errors
+
+## Related Files
+
+- `commands/refactor-clean.md` - Command that invokes this agent
+- `rules/agents.md` - Rules for agent delegation
+- `README.md` - Overview of agents directory
+
+## Troubleshooting
+
+**Issue**: Detection tools flag code as unused but it's actually used
+- **Solution**: Check for dynamic imports, string-based references, runtime usage patterns
+
+**Issue**: Removing code breaks something unexpected
+- **Solution**: Review git history, check for indirect dependencies, verify test coverage
+
+**Issue**: Too many false positives from detection tools
+- **Solution**: Adjust tool configuration, add ignore patterns, review findings manually
 
 **Remember**: Dead code is technical debt. Regular cleanup keeps the codebase maintainable and fast. But safety first - never remove code without understanding why it exists.

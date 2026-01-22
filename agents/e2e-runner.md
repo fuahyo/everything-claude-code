@@ -705,4 +705,187 @@ After E2E test run:
 
 ---
 
+## When to Use
+
+Use this agent when:
+- Testing critical user journeys end-to-end
+- Verifying multi-step flows work correctly
+- Preparing for production deployment
+- Validating UI interactions and navigation
+- Testing integration between frontend and backend
+- Ensuring critical features work across browsers
+
+## When NOT to Use
+
+- For unit tests (use tdd-guide)
+- For simple component tests
+- When E2E tests already exist and pass
+- For testing implementation details
+- During active development (wait until feature is stable)
+
+## Example Usage
+
+```
+User: /e2e Test the market search and view flow
+
+Agent (e2e-runner):
+# E2E Test Generation: Market Search and View Flow
+
+## Test Scenario Identified
+**User Journey:** Market Search → View Results → Click Market → View Details
+
+## Generated Test Code
+
+```typescript
+// tests/e2e/markets/search-and-view.spec.ts
+import { test, expect } from '@playwright/test'
+import { MarketsPage } from '../../pages/MarketsPage'
+
+test.describe('Market Search and View Flow', () => {
+  test('user can search markets and view details', async ({ page }) => {
+    const marketsPage = new MarketsPage(page)
+    await marketsPage.goto()
+    
+    await marketsPage.searchMarkets('election')
+    await page.waitForResponse(resp =>
+      resp.url().includes('/api/markets/search') && resp.status() === 200
+    )
+    
+    const marketCards = marketsPage.marketCards
+    await expect(marketCards.first()).toBeVisible()
+    
+    await marketCards.first().click()
+    await expect(page).toHaveURL(/\/markets\/[a-z0-9-]+/)
+  })
+})
+```
+
+## Running Tests
+```bash
+npx playwright test tests/e2e/markets/search-and-view.spec.ts
+```
+
+## Test Results
+✅ 1 test passed (4.2s)
+📸 Screenshots: 2 files
+📊 HTML Report: playwright-report/index.html
+```
+
+## Integration
+
+This agent is invoked by:
+- `/e2e` command - Manual invocation
+- Rules - Automatic detection when E2E testing is needed
+- CI/CD pipelines - Automated test execution
+
+Related agents:
+- `tdd-guide` - For unit and integration tests
+- `code-reviewer` - Review test quality
+
+Related commands:
+- `/e2e` - Invokes this agent
+- `/tdd` - For unit tests
+- `/test-coverage` - Verify coverage
+
+## When to Use
+
+Use this agent when:
+- Testing critical user journeys end-to-end
+- Verifying multi-step workflows
+- Preparing for production deployment
+- Validating UI interactions and navigation
+- Testing integration between frontend and backend
+- Ensuring critical flows work across browsers
+
+## When NOT to Use
+
+- For unit tests (use tdd-guide)
+- For simple component tests
+- When E2E tests already exist and pass
+- For testing implementation details
+- During active development (wait until feature is stable)
+
+## Example Usage
+
+```
+User: /e2e Test the market search and view flow
+
+Agent (e2e-runner):
+# E2E Test Generation: Market Search and View Flow
+
+## Test Scenario Identified
+
+**User Journey:** Market Search → View Results → Click Market → View Details
+
+## Generated Test Code
+
+```typescript
+// tests/e2e/markets/search-and-view.spec.ts
+import { test, expect } from '@playwright/test'
+import { MarketsPage } from '../../pages/MarketsPage'
+
+test.describe('Market Search and View Flow', () => {
+  test('user can search markets and view details', async ({ page }) => {
+    const marketsPage = new MarketsPage(page)
+    await marketsPage.goto()
+    
+    await marketsPage.searchMarkets('election')
+    await page.waitForResponse(resp =>
+      resp.url().includes('/api/markets/search') && resp.status() === 200
+    )
+    
+    const marketCards = marketsPage.marketCards
+    await expect(marketCards.first()).toBeVisible()
+    
+    await marketCards.first().click()
+    await expect(page).toHaveURL(/\/markets\/[a-z0-9-]+/)
+  })
+})
+```
+
+## Running Tests
+
+```bash
+npx playwright test tests/e2e/markets/search-and-view.spec.ts
+```
+
+Running 1 test using 1 worker
+  ✓  [chromium] › search-and-view.spec.ts:5:3 › user can search markets and view details (4.2s)
+
+1 passed (4.2s)
+```
+
+## Integration
+
+This agent is invoked by:
+- `/e2e` command - Manual invocation
+- Rules - Automatic detection when E2E testing is needed
+- CI/CD pipelines - Automated test execution
+
+Related agents:
+- `tdd-guide` - For unit and integration tests
+- `code-reviewer` - Review test quality
+
+Related commands:
+- `/e2e` - Invokes this agent
+- `/tdd` - For unit tests
+- `/test-coverage` - Verify overall coverage
+
+## Related Files
+
+- `commands/e2e.md` - Command that invokes this agent
+- `agents/tdd-guide.md` - For unit and integration tests
+- `README.md` - Overview of agents directory
+
+## Troubleshooting
+
+**Issue**: Tests are flaky and fail intermittently
+- **Solution**: Add explicit waits, check for race conditions, increase timeouts, use stable selectors
+
+**Issue**: Tests pass locally but fail in CI
+- **Solution**: Check environment differences, ensure CI has proper setup, verify browser installation
+
+**Issue**: Tests are too slow
+- **Solution**: Run tests in parallel, optimize test data setup, use test isolation
+
 **Remember**: E2E tests are your last line of defense before production. They catch integration issues that unit tests miss. Invest time in making them stable, fast, and comprehensive. For Example Project, focus especially on financial flows - one bug could cost users real money.

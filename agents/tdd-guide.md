@@ -277,4 +277,122 @@ npm test && npm run lint
 npm test -- --coverage --ci
 ```
 
+## When to Use
+
+Use this agent when:
+- Writing new features or functionality
+- Fixing bugs (write test first to reproduce)
+- Refactoring existing code
+- Adding API endpoints
+- Creating new components
+- Building critical business logic
+- When test coverage is below 80%
+
+## When NOT to Use
+
+- Documentation-only changes
+- Configuration updates
+- Simple formatting changes
+- Non-code changes
+- When tests already exist and pass
+
+## Example Usage
+
+```
+User: /tdd Add a function to calculate market liquidity score
+
+Agent (tdd-guide):
+# TDD Session: Market Liquidity Score Calculator
+
+## Step 1: Define Interface (SCAFFOLD)
+
+```typescript
+// lib/liquidity.ts
+export interface MarketData {
+  totalVolume: number
+  bidAskSpread: number
+  activeTraders: number
+  lastTradeTime: Date
+}
+
+export function calculateLiquidityScore(market: MarketData): number {
+  throw new Error('Not implemented')
+}
+```
+
+## Step 2: Write Failing Test (RED)
+
+```typescript
+// lib/liquidity.test.ts
+describe('calculateLiquidityScore', () => {
+  it('returns high score for liquid market', () => {
+    const market = {
+      totalVolume: 100000,
+      bidAskSpread: 0.01,
+      activeTraders: 500,
+      lastTradeTime: new Date()
+    }
+    const score = calculateLiquidityScore(market)
+    expect(score).toBeGreaterThan(80)
+  })
+})
+```
+
+Running tests...
+❌ FAIL - Error: Not implemented
+✅ Tests fail as expected
+
+## Step 3: Implement Minimal Code (GREEN)
+
+[Implements minimal code to pass tests]
+
+Running tests...
+✅ PASS - All tests passing
+
+## Step 4: Refactor (IMPROVE)
+
+[Refactors with constants and better structure]
+
+Running tests...
+✅ PASS - Refactoring complete
+
+## Step 5: Verify Coverage
+
+Coverage: 100% ✅ (Target: 80%)
+```
+
+## Integration
+
+This agent is invoked by:
+- `/tdd` command - Manual invocation
+- Rules - Automatic detection when writing new code
+- `planner` agent - Plans may include TDD workflow
+
+Related agents:
+- `e2e-runner` - For E2E tests after unit tests
+- `code-reviewer` - Review test quality
+
+Related commands:
+- `/tdd` - Invokes this agent
+- `/e2e` - For E2E tests
+- `/test-coverage` - Verify coverage
+
+## Related Files
+
+- `commands/tdd.md` - Command that invokes this agent
+- `skills/tdd-workflow/SKILL.md` - TDD workflow skill
+- `rules/testing.md` - Testing rules
+- `README.md` - Overview of agents directory
+
+## Troubleshooting
+
+**Issue**: Tests are too complex or test implementation details
+- **Solution**: Focus on user-visible behavior, simplify test structure
+
+**Issue**: Coverage is below 80% but code seems tested
+- **Solution**: Check coverage report for untested branches/edge cases
+
+**Issue**: Tests are flaky or slow
+- **Solution**: Review test setup, use proper mocks, avoid real network calls
+
 **Remember**: No code without tests. Tests are not optional. They are the safety net that enables confident refactoring, rapid development, and production reliability.

@@ -542,4 +542,138 @@ After security review:
 
 ---
 
+## When to Use
+
+Use this agent when:
+- After writing code that handles user input
+- Creating new API endpoints
+- Implementing authentication/authorization
+- Working with sensitive data
+- Before production deployments
+- When security vulnerabilities are suspected
+- After integrating third-party services
+- When handling file uploads
+
+## When NOT to Use
+
+- For non-security code reviews (use code-reviewer)
+- Documentation updates
+- Simple formatting changes
+- When code doesn't touch security-sensitive areas
+
+## Example Usage
+
+```
+User: Review this authentication code for security issues
+
+Agent (security-reviewer):
+# Security Review Report
+
+**File/Component:** src/lib/auth.ts
+**Reviewed:** 2026-01-20
+**Reviewer:** security-reviewer agent
+
+## Summary
+- **Critical Issues:** 2
+- **High Issues:** 1
+- **Medium Issues:** 3
+- **Risk Level:** 🔴 HIGH
+
+## Critical Issues (Fix Immediately)
+
+### 1. Hardcoded JWT Secret
+**Severity:** CRITICAL
+**Category:** Secrets Management
+**Location:** `src/lib/auth.ts:15`
+
+**Issue:**
+JWT secret is hardcoded in source code, exposing authentication system.
+
+**Impact:**
+Attackers could forge authentication tokens, gaining unauthorized access.
+
+**Proof of Concept:**
+```javascript
+// Attacker can extract secret and create valid tokens
+const secret = "my-super-secret-key-12345"
+const token = jwt.sign({ userId: "admin" }, secret)
+```
+
+**Remediation:**
+```typescript
+// ✅ Secure implementation
+const secret = process.env.JWT_SECRET
+if (!secret) {
+  throw new Error('JWT_SECRET not configured')
+}
+```
+
+**References:**
+- OWASP: A07:2021 – Identification and Authentication Failures
+- CWE-798: Use of Hard-coded Credentials
+
+### 2. SQL Injection Vulnerability
+**Severity:** CRITICAL
+**Category:** Injection
+**Location:** `src/lib/auth.ts:42`
+
+**Issue:**
+User input concatenated directly into SQL query.
+
+**Remediation:**
+Use parameterized queries with Supabase client.
+
+[Continues with detailed analysis...]
+
+## Security Checklist
+- [ ] No hardcoded secrets
+- [ ] All inputs validated
+- [ ] SQL injection prevention
+- [ ] XSS prevention
+- [ ] Authentication required
+- [ ] Authorization verified
+- [ ] Rate limiting enabled
+- [ ] Dependencies up to date
+
+## Recommendations
+1. Move all secrets to environment variables
+2. Add input validation with Zod schemas
+3. Enable rate limiting on auth endpoints
+4. Update dependencies (2 vulnerabilities found)
+```
+
+## Integration
+
+This agent is invoked by:
+- `/code-review` command - When security review is needed
+- Rules - Automatic detection of security-sensitive code
+- CI/CD pipelines - Automated security scanning
+
+Related agents:
+- `code-reviewer` - General code review (includes security)
+- `build-error-resolver` - Fix errors before security review
+
+Related commands:
+- `/code-review` - May invoke this agent
+- Security hooks - Automatic invocation on sensitive files
+
+## Related Files
+
+- `agents/code-reviewer.md` - General code review agent
+- `skills/security-review/SKILL.md` - Security review skill
+- `rules/security.md` - Security rules
+- `README.md` - Overview of agents directory
+- `README.md` - Overview of agents directory
+
+## Troubleshooting
+
+**Issue**: Too many false positives in security checks
+- **Solution**: Review context, verify if actually a vulnerability, adjust detection patterns
+
+**Issue**: Security review misses vulnerabilities
+- **Solution**: Use multiple tools, manual review, consider external security audit
+
+**Issue**: Security fixes break functionality
+- **Solution**: Test thoroughly, implement fixes incrementally, verify backward compatibility
+
 **Remember**: Security is not optional, especially for platforms handling real money. One vulnerability can cost users real financial losses. Be thorough, be paranoid, be proactive.

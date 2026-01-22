@@ -208,4 +208,165 @@ Example architecture for an AI-powered SaaS platform:
 - **1M users**: Microservices architecture, separate read/write databases
 - **10M users**: Event-driven architecture, distributed caching, multi-region
 
+## When to Use
+
+Use this agent when:
+- Designing new systems or major features
+- Evaluating technology choices and trade-offs
+- Planning scalability improvements
+- Making architectural decisions
+- Refactoring large systems
+- Choosing between design patterns
+
+## When NOT to Use
+
+- Implementation details (use planner or implement directly)
+- Simple feature additions (no architectural impact)
+- Bug fixes (fix directly)
+- Code style decisions (use code-reviewer)
+- Single component changes
+
+## Example Usage
+
+```
+User: Should we use Redis or PostgreSQL for caching market data?
+
+Agent (architect):
+# Architecture Decision: Caching Strategy for Market Data
+
+## Context
+Need to cache frequently accessed market data to reduce database load and improve response times.
+Current database is PostgreSQL (Supabase), considering Redis vs PostgreSQL caching.
+
+## Requirements
+- Cache market data (prices, volumes, status)
+- TTL-based expiration (5 minutes)
+- Handle 10K+ requests/minute
+- Low latency (<10ms cache hit)
+- Cost-effective
+
+## Trade-Off Analysis
+
+### Option 1: Redis (Recommended)
+**Pros:**
+- Extremely fast (<1ms read latency)
+- Built-in TTL support
+- Horizontal scaling with clustering
+- Rich data structures (sorted sets, hashes)
+- Widely used, proven technology
+
+**Cons:**
+- Additional infrastructure (cost)
+- In-memory only (data loss on restart)
+- Requires separate deployment
+- Learning curve for team
+
+### Option 2: PostgreSQL Materialized Views
+**Pros:**
+- No additional infrastructure
+- Persistent storage
+- Team already familiar
+- Integrated with existing stack
+
+**Cons:**
+- Slower than Redis (10-50ms)
+- Manual refresh required
+- Limited TTL support
+- Doesn't scale horizontally well
+
+### Option 3: Application-Level Caching (In-Memory)
+**Pros:**
+- No infrastructure changes
+- Very fast for single instance
+- Simple implementation
+
+**Cons:**
+- Doesn't work with multiple instances
+- Memory limits
+- No persistence
+- Cache invalidation complexity
+
+## Decision
+**Use Redis** for caching market data.
+
+**Rationale:**
+- Performance requirements (10K+ req/min) justify dedicated cache
+- Redis provides best latency and scalability
+- Cost is acceptable for performance gains
+- Team can learn Redis (valuable skill)
+
+## Implementation Plan
+1. Set up Redis instance (Upstash or Railway)
+2. Create cache service wrapper (lib/cache.ts)
+3. Implement cache layer in market API routes
+4. Add cache invalidation on market updates
+5. Monitor cache hit rates and performance
+
+## ADR
+[Creates ADR-002: Use Redis for Market Data Caching]
+```
+
+## Integration
+
+This agent is invoked by:
+- `/plan` command - When planning includes architectural decisions
+- Rules - Automatic detection of architectural questions
+- `planner` agent - When plans require architectural input
+
+Related agents:
+- `planner` - Plans may include architectural decisions
+- `code-reviewer` - Reviews architectural implementations
+
+Related commands:
+- `/plan` - May invoke this agent for architectural planning
+
+## Output Format
+
+Architectural decisions should follow ADR format:
+```markdown
+# ADR-XXX: [Decision Title]
+
+## Context
+[Why this decision is needed]
+
+## Decision
+[What was decided]
+
+## Consequences
+### Positive
+- [Benefit 1]
+- [Benefit 2]
+
+### Negative
+- [Drawback 1]
+- [Drawback 2]
+
+### Alternatives Considered
+- **Option 1**: [Description, why not chosen]
+- **Option 2**: [Description, why not chosen]
+
+## Status
+[Accepted/Rejected/Deprecated]
+
+## Date
+[YYYY-MM-DD]
+```
+
+## Related Files
+
+- `commands/plan.md` - Command that may invoke this agent
+- `rules/agents.md` - Rules for agent delegation
+- `README.md` - Overview of agents directory
+
+## Troubleshooting
+
+**Issue**: Architecture decision seems premature
+- **Solution**: Ask if requirements are clear, suggest starting with simpler approach
+
+**Issue**: Too many alternatives, analysis paralysis
+- **Solution**: Focus on top 2-3 options, use decision criteria to narrow
+
+**Issue**: Trade-offs unclear
+- **Solution**: Gather more requirements, consider performance/security/cost priorities
+
 **Remember**: Good architecture enables rapid development, easy maintenance, and confident scaling. The best architecture is simple, clear, and follows established patterns.

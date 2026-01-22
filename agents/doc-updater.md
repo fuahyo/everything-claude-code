@@ -449,4 +449,110 @@ Before committing documentation:
 
 ---
 
+## When to Use
+
+Use this agent when:
+- After major features have been added
+- When architecture has changed significantly
+- Before releases (documentation audit)
+- When documentation is clearly outdated
+- When onboarding new developers
+- When codemaps need regeneration
+
+## When NOT to Use
+
+- For minor bug fixes
+- When code hasn't changed significantly
+- During active development (wait until stable)
+- For documentation-only projects
+- When documentation is already current
+
+## Example Usage
+
+```
+User: /update-docs
+
+Agent (doc-updater):
+# Documentation Update Report
+
+**Date:** 2026-01-20
+**Scope:** Full documentation refresh
+
+## Analysis Phase
+
+### 1. Package.json Scripts
+Found 12 scripts, generating reference table...
+
+### 2. Environment Variables
+Extracted 15 variables from .env.example...
+
+### 3. Codemap Generation
+Analyzing codebase structure...
+- Frontend: 45 files, 3 main routes
+- Backend: 12 API routes, 5 services
+- Database: 8 tables, 3 views
+
+## Generated Documentation
+
+### Updated Files
+- `docs/CONTRIB.md` - Development workflow
+- `docs/RUNBOOK.md` - Deployment procedures
+- `docs/CODEMAPS/frontend.md` - Frontend architecture
+- `docs/CODEMAPS/backend.md` - Backend structure
+- `docs/CODEMAPS/data.md` - Database schema
+
+### Obsolete Documentation Identified
+- `docs/OLD_API.md` - Not modified in 120 days
+- `docs/LEGACY_SETUP.md` - Not modified in 95 days
+
+## Changes Summary
+- Files updated: 5
+- Files created: 3
+- Files flagged for review: 2
+- Links verified: 45/45 ✅
+- Code examples tested: 12/12 ✅
+
+## Verification
+- ✅ All links work
+- ✅ Code examples compile
+- ✅ Architecture diagrams match reality
+- ✅ No broken references
+```
+
+## Integration
+
+This agent is invoked by:
+- `/update-docs` command - Manual invocation
+- `/update-codemaps` command - Codemap generation only
+- Rules - Automatic detection after major changes
+- Scheduled tasks - Periodic documentation updates
+
+Related agents:
+- `planner` - Plans may include documentation needs
+- `architect` - Architecture changes require doc updates
+
+Related commands:
+- `/update-docs` - Invokes this agent
+- `/update-codemaps` - Codemap generation only
+- `/plan` - May include documentation planning
+
+## Related Files
+
+- `commands/update-docs.md` - Command that invokes this agent
+- `commands/update-codemaps.md` - Codemap generation command
+- `README.md` - Overview of agents directory
+- `commands/update-codemaps.md` - Command for codemap generation
+- `README.md` - Overview of agents directory
+
+## Troubleshooting
+
+**Issue**: Generated codemaps are too large
+- **Solution**: Focus on high-level structure, exclude implementation details, split into multiple files
+
+**Issue**: Documentation doesn't match code after regeneration
+- **Solution**: Verify code is committed, check for uncommitted changes, regenerate from clean state
+
+**Issue**: Codemap generation is slow
+- **Solution**: Use incremental analysis, cache results, focus on changed files only
+
 **Remember**: Documentation that doesn't match reality is worse than no documentation. Always generate from source of truth (the actual code).
